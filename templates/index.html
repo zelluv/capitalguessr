@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flask App</title>
+    <title>Guess the Flag</title>
+    <script>
+        function selectCountry(country) {
+            document.getElementById('selected_country').value = country;
+            document.getElementById('country_form').submit();
+        }
+    </script>
 </head>
 <body>
-    <h1>Welcome to Flask App!</h1>
-    <h2>Guess the Flag</h2>
+    <h1>Which is the flag of {{ correct_country }}?</h1>
     <p>Question {{ current_question }} of {{ total_questions }}</p>
-    <p>Which is the flag of {{ correct_country }}?</p>
-    <form action="/check" method="post">
+    <form id="country_form" method="POST" action="{{ url_for('check') }}">
+        <input type="hidden" id="selected_country" name="country">
         {% for country in countries %}
-            <div>
-                <input type="radio" id="{{ country.name }}" name="country" value="{{ country.name }}" required>
-                <label for="{{ country.name }}">
-                    <img src="{{ country.flag }}" alt="Flag of {{ country.name }}" width="100">
-                </label>
+            <div onclick="selectCountry('{{ country.name }}')" style="display: inline-block; margin: 10px; cursor: pointer;">
+                <img src="{{ country.flag }}" alt="Flag of {{ country.name }}" width="100">
             </div>
         {% endfor %}
-        <button type="submit">Submit</button>
     </form>
 </body>
 </html>
