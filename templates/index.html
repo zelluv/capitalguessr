@@ -8,12 +8,12 @@
 <body>
     <h1>Welcome to Flask App!</h1>
     <h2>Guess the Flag</h2>
+    <p>Question {{ current_question }} of {{ total_questions }}</p>
     <p>Which is the flag of {{ correct_country }}?</p>
     <form action="/check" method="post">
-        <input type="hidden" name="correct_country" value="{{ correct_country }}">
         {% for country in countries %}
             <div>
-                <input type="radio" id="{{ country.name }}" name="country" value="{{ country.name }}">
+                <input type="radio" id="{{ country.name }}" name="country" value="{{ country.name }}" required>
                 <label for="{{ country.name }}">
                     <img src="{{ country.flag }}" alt="Flag of {{ country.name }}" width="100">
                 </label>
