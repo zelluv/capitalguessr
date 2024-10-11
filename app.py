@@ -7,7 +7,10 @@ app.secret_key = 'your_secret_key'  # Tarvitaan sessioiden käyttämiseen
 
 def get_countries():
     response = requests.get('https://restcountries.com/v3.1/region/europe')
-    return response.json()
+    countries = response.json()
+    # Valitaan vain itsenäiset maat
+    independent_countries = [country for country in countries if country.get('independent', False)]
+    return independent_countries
 
 @app.route('/')
 def home():
@@ -72,6 +75,11 @@ def check():
 
 @app.route('/next')
 def next_question():
+    return redirect(url_for('home'))
+
+@app.route('/reset')
+def reset():
+    session.clear()
     return redirect(url_for('home'))
 
 if __name__ == '__main__':
