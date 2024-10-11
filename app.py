@@ -26,14 +26,21 @@ def home():
         session.clear()
         return render_template('final_result.html', score=score, max_score=max_score)
 
-    # Valitse viisi satunnaista maata, joita ei ole vielä kysytty
+    # Valitse jäljellä olevat maat, joita ei ole vielä kysytty
     remaining_countries = [country for country in countries if country['name']['common'] not in session['asked_countries']]
-    selected_countries = random.sample(remaining_countries, 5)
 
     # Valitse yksi maa oikeaksi vastaukseksi
-    correct_country = random.choice(selected_countries)
+    correct_country = random.choice(remaining_countries)
     session['correct_country'] = correct_country['name']['common']
+    session['correct_country_flag'] = correct_country['flags']['png']
     session['asked_countries'].append(correct_country['name']['common'])
+
+    # Valitse muut vaihtoehdot kaikista maista, varmistaen, että ne eivät ole sama kuin oikea vastaus
+    other_options = [country for country in countries if country['name']['common'] != correct_country['name']['common']]
+    selected_countries = random.sample(other_options, 4) + [correct_country]
+
+    # Sekoita valitut maat
+    random.shuffle(selected_countries)
 
     # Hae tarvittavat tiedot
     countries_info = [{
@@ -54,11 +61,12 @@ def check():
     
     selected_country = request.form['country']
     correct_country = session['correct_country']
+    correct_country_flag = session['correct_country_flag']
     if selected_country == correct_country:
         session['score'] += 1
         result = "Correct!"
     else:
-        result = "Wrong! The correct answer was " + correct_country
+        result = f"Wrong! The flag of {correct_country} is <img src='{correct_country_flag}' alt='Flag of {correct_country}' width='100'>"
     
     return render_template('result.html', result=result)
 

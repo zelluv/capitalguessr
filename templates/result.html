@@ -6,7 +6,7 @@
     <title>Result</title>
 </head>
 <body>
-    <h1>{{ result }}</h1>
+    <h1>{{ result|safe }}</h1>
     <a href="{{ url_for('next_question') }}">Next Question</a>
 </body>
 </html>
