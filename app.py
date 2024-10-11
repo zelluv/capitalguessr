@@ -5,24 +5,29 @@ import random
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Tarvitaan sessioiden käyttämiseen
 
+def get_countries():
+    response = requests.get('https://restcountries.com/v3.1/region/europe')
+    return response.json()
+
 @app.route('/')
 def home():
-    # Hae kaikki Euroopan maat, jos niitä ei ole jo haettu
-    if 'countries' not in session:
-        response = requests.get('https://restcountries.com/v3.1/region/europe')
-        session['countries'] = response.json()
+    # Hae kaikki Euroopan maat
+    countries = get_countries()
+
+    # Jos sessio ei ole aloitettu, alusta se
+    if 'score' not in session:
         session['score'] = 0
         session['asked_countries'] = []
 
     # Jos kaikki maat on kysytty, näytä tulossivu
-    if len(session['asked_countries']) == len(session['countries']):
-        max_score = len(session['countries'])
+    if len(session['asked_countries']) == len(countries):
+        max_score = len(countries)
         score = session['score']
         session.clear()
         return render_template('final_result.html', score=score, max_score=max_score)
 
     # Valitse viisi satunnaista maata, joita ei ole vielä kysytty
-    remaining_countries = [country for country in session['countries'] if country['name']['common'] not in session['asked_countries']]
+    remaining_countries = [country for country in countries if country['name']['common'] not in session['asked_countries']]
     selected_countries = random.sample(remaining_countries, 5)
 
     # Valitse yksi maa oikeaksi vastaukseksi
@@ -38,7 +43,7 @@ def home():
 
     # Laske current_question sen jälkeen, kun uusi kysymys on lisätty listaan
     current_question = len(session['asked_countries'])
-    total_questions = len(session['countries'])
+    total_questions = len(countries)
 
     return render_template('index.html', countries=countries_info, correct_country=correct_country['name']['common'], current_question=current_question, total_questions=total_questions)
 
