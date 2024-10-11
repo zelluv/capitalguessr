@@ -7,10 +7,19 @@
 </head>
 <body>
     <h1>Welcome to Flask App!</h1>
-    <h2>Random European Country</h2>
-    <p><strong>Name:</strong> {{ country.name }}</p>
-    <p><strong>Capital:</strong> {{ country.capital }}</p>
-    <p><strong>Population:</strong> {{ country.population }}</p>
-    <img src="{{ country.flag }}" alt="Flag of {{ country.name }}">
+    <h2>Guess the Flag</h2>
+    <p>Which is the flag of {{ correct_country }}?</p>
+    <form action="/check" method="post">
+        <input type="hidden" name="correct_country" value="{{ correct_country }}">
+        {% for country in countries %}
+            <div>
+                <input type="radio" id="{{ country.name }}" name="country" value="{{ country.name }}">
+                <label for="{{ country.name }}">
+                    <img src="{{ country.flag }}" alt="Flag of {{ country.name }}" width="100">
+                </label>
+            </div>
+        {% endfor %}
+        <button type="submit">Submit</button>
+    </form>
 </body>
 </html>
