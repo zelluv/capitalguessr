@@ -38,9 +38,16 @@ def home():
     session['correct_country_flag'] = correct_country['flags']['png']
     session['asked_countries'].append(correct_country['name']['common'])
 
-    # Valitse muut vaihtoehdot kaikista maista, varmistaen, että ne eivät ole sama kuin oikea vastaus
-    other_options = [country for country in countries if country['name']['common'] != correct_country['name']['common']]
-    selected_countries = random.sample(other_options, 4) + [correct_country]
+    # Lista tietyistä maista
+    specific_countries = ['Slovenia', 'Slovakia', 'Croatia', 'Serbia', 'Netherlands']
+
+    # Jos oikea maa on yksi tietyistä maista, aseta vaihtoehdoiksi nämä viisi maata
+    if correct_country['name']['common'] in specific_countries:
+        selected_countries = [country for country in countries if country['name']['common'] in specific_countries]
+    else:
+        # Valitse muut vaihtoehdot kaikista maista, varmistaen, että ne eivät ole sama kuin oikea vastaus
+        other_options = [country for country in countries if country['name']['common'] != correct_country['name']['common']]
+        selected_countries = random.sample(other_options, 4) + [correct_country]
 
     # Sekoita valitut maat
     random.shuffle(selected_countries)
