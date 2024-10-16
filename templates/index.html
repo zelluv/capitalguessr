@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guess the Flag</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script>
         function selectCountry(country) {
             document.getElementById('selected_country').value = country;
@@ -13,16 +14,17 @@
 </head>
 <body>
     <h1>Which is the flag of {{ correct_country }}?</h1>
-    <p>Question {{ current_question }} of {{ total_questions }}</p>
+    <p class="question-info">Question {{ current_question }} of {{ total_questions }}</p>
     <form id="country_form" method="POST" action="{{ url_for('check') }}">
         <input type="hidden" id="selected_country" name="country">
-        {% for country in countries %}
-            <div onclick="selectCountry('{{ country.name }}')" style="display: inline-block; margin: 10px; cursor: pointer;">
-                <img src="{{ country.flag }}" alt="Flag of {{ country.name }}" width="100">
-            </div>
-        {% endfor %}
+        <div class="flag-container">
+            {% for country in countries %}
+                <div class="flag-item" onclick="selectCountry('{{ country.name }}')">
+                    <img src="{{ country.flag }}" alt="Flag of {{ country.name }}" width="150">
+                </div>
+            {% endfor %}
+        </div>
     </form>
-    <br>
-    <a href="{{ url_for('reset') }}">Reset</a>
+    <a href="{{ url_for('reset') }}" class="btn-reset">Reset</a>
 </body>
 </html>
