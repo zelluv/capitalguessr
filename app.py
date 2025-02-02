@@ -125,5 +125,10 @@ def set_region():
     session['selected_region'] = selected_region
     return redirect(url_for('home'))
 
+@app.route('/recent_scores')
+def recent_scores():
+    scores = read_scores()[-10:]  # Read the 10 most recent scores
+    return render_template('recent_scores.html', recent_scores=scores)
+
 if __name__ == '__main__':
     app.run(debug=True)

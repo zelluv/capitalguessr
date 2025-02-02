@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Select Region</title>
+    <title>Recent Scores</title>
     <style>
         body {
             display: flex;
@@ -33,19 +33,15 @@
     </style>
 </head>
 <body>
-    <h1>Select a Region to Start the Quiz</h1>
-    <form action="{{ url_for('set_region') }}" method="post">
-        {% for region, url in regions.items() %}
-        <div>
-            <input type="radio" id="{{ region }}" name="region" value="{{ url }}" required>
-            <label for="{{ region }}">{{ region }} ({{ region_counts[region] }} countries)</label>
-        </div>
+    <h1>Recent Scores</h1>
+    <ul>
+        {% for score in recent_scores %}
+        <li>{{ score[0] }}: {{ score[1] }}</li>
         {% endfor %}
-        <button type="submit">Start Quiz</button>
-    </form>
+    </ul>
     <div class="button-container">
-        <a href="{{ url_for('recent_scores') }}">
-            <button>View Recent Scores</button>
+        <a href="{{ url_for('select_region') }}">
+            <button>Back to Region Selection</button>
         </a>
     </div>
 </body>
