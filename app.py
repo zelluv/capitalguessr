@@ -32,6 +32,19 @@ def write_score(score, start_time, region, max_score, name):
 
 @app.route('/')
 def home():
+    if 'selected_region' not in session:
+        regions = {
+            'Northern Europe': 'https://restcountries.com/v3.1/subregion/Northern Europe',
+            'Southern Europe': 'https://restcountries.com/v3.1/subregion/Southern Europe',
+            'Europe': 'https://restcountries.com/v3.1/region/europe'
+        }
+        region_counts = {}
+        for region, url in regions.items():
+            countries = requests.get(url).json()
+            independent_countries = [country for country in countries if country.get('independent', False)]
+            region_counts[region] = len(independent_countries)
+        return render_template('index.html', regions=regions, region_counts=region_counts)
+
     selected_region = session.get('selected_region', 'https://restcountries.com/v3.1/region/europe')
     countries = get_countries(selected_region)
 
@@ -80,21 +93,15 @@ def home():
     current_question = len(session['asked_countries'])
     total_questions = len(countries)  # Each country has a flag and a capital question
 
-    return render_template('index.html', countries=countries_info, correct_country=correct_country['name']['common'], correct_capital=session['correct_country_capital'], current_question=current_question, total_questions=total_questions)
+    return render_template('quiz.html', countries=countries_info, correct_country=correct_country['name']['common'], correct_capital=session['correct_country_capital'], current_question=current_question, total_questions=total_questions)
 
-@app.route('/select_region')
-def select_region():
-    regions = {
-        'Northern Europe': 'https://restcountries.com/v3.1/subregion/Northern Europe',
-        'Southern Europe': 'https://restcountries.com/v3.1/subregion/Southern Europe',
-        'Europe': 'https://restcountries.com/v3.1/region/europe'
-    }
-    region_counts = {}
-    for region, url in regions.items():
-        countries = requests.get(url).json()
-        independent_countries = [country for country in countries if country.get('independent', False)]
-        region_counts[region] = len(independent_countries)
-    return render_template('select_region.html', regions=regions, region_counts=region_counts)
+@app.route('/set_region', methods=['POST'])
+def set_region():
+    selected_region = request.form['region']
+    name = request.form.get('name', '')
+    session['selected_region'] = selected_region
+    session['name'] = name
+    return redirect(url_for('home'))
 
 @app.route('/check', methods=['POST'])
 def check():
@@ -124,14 +131,6 @@ def next_question():
 @app.route('/reset')
 def reset():
     session.clear()
-    return redirect(url_for('select_region'))
-
-@app.route('/set_region', methods=['POST'])
-def set_region():
-    selected_region = request.form['region']
-    name = request.form.get('name', '')
-    session['selected_region'] = selected_region
-    session['name'] = name
     return redirect(url_for('home'))
 
 @app.route('/recent_scores')

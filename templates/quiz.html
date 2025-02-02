@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .flag-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .flag-container label {
+            cursor: pointer;
+        }
+        .flag-container input[type="radio"] {
+            display: none;
+        }
+        .flag-container input[type="radio"]:checked + img {
+            border: 3px solid #007BFF; /* Change the color and width as needed */
+            border-radius: 5px; /* Optional: add rounded corners */
+        }
+        .capital-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .capital-options {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .capital-options label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .submit-button {
+            margin: 0 auto;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Question {{ current_question }} of {{ total_questions }}</h1>
+    <h2>Which is the flag of {{ correct_country }}?</h2>
+    <form action="{{ url_for('check') }}" method="post">
+        <div class="flag-container">
+            {% for country in countries %}
+            <label>
+                <input type="radio" name="country" value="{{ country.name }}" required>
+                <img src="{{ country.flag }}" alt="Flag of {{ country.name }}" width="100">
+            </label>
+            {% endfor %}
+        </div>
+        <h2>What is the capital of {{ correct_country }}?</h2>
+        <div class="capital-container">
+            <div class="capital-options">
+                {% for country in countries %}
+                <label>
+                    <input type="radio" name="capital" value="{{ country.capital }}" required> {{ country.capital }}
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="button-container">
+            <div class="submit-button">
+                <button type="submit">Submit</button>
+            </div>
+        </div>
+    </form>
+    <form action="{{ url_for('reset') }}" method="get" style="margin-top: 40px;">
+        <button type="submit">Reset Quiz</button>
+    </form>
+</body>
+</html>
