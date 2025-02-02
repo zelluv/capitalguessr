@@ -22,13 +22,13 @@ def read_scores():
     except FileNotFoundError:
         return []
 
-def write_score(score, start_time, region, max_score):
+def write_score(score, start_time, region, max_score, name):
     end_time = time.time()
     duration = end_time - start_time
     minutes, seconds = divmod(int(duration), 60)
     date = datetime.datetime.now().strftime('%Y-%m-%d')
     with open('scores.txt', 'a') as file:
-        file.write(f'{date},{minutes}:{seconds:02d},{score},{region} ({max_score} points)\n')
+        file.write(f'{date},{minutes}:{seconds:02d},{score},{region} ({max_score} points),{name}\n')
 
 @app.route('/')
 def home():
@@ -46,7 +46,8 @@ def home():
     if len(session['asked_countries']) == len(countries):
         max_score = len(countries) * 2  # Each country has a flag and a capital question
         score = session['score']
-        write_score(score, session['start_time'], session['selected_region_name'], max_score)
+        name = session.get('name', '')
+        write_score(score, session['start_time'], session['selected_region_name'], max_score, name)
         session.clear()
         recent_scores = read_scores()[-10:]  # Read the 10 most recent scores
         return render_template('final_result.html', score=score, max_score=max_score, recent_scores=recent_scores)
@@ -128,7 +129,9 @@ def reset():
 @app.route('/set_region', methods=['POST'])
 def set_region():
     selected_region = request.form['region']
+    name = request.form.get('name', '')
     session['selected_region'] = selected_region
+    session['name'] = name
     return redirect(url_for('home'))
 
 @app.route('/recent_scores')

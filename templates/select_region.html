@@ -30,11 +30,22 @@
         button:hover {
             background-color: #0056b3;
         }
+        .title-block {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
-    <h1>Select a Region to Start the Quiz</h1>
+    <div class="title-block">
+        <h1>European Country Flags and Capitals Quiz</h1>
+        <p>Test your knowledge of European countries by identifying their flags and capitals.</p>
+    </div>
+    <h2>Select a Region to Start the Quiz</h2>
     <form action="{{ url_for('set_region') }}" method="post">
+        <div>
+            <label for="name">Enter your name:</label>
+            <input type="text" id="name" name="name">
+        </div>
         {% for region, url in regions.items() %}
         <div>
             <input type="radio" id="{{ region }}" name="region" value="{{ url }}" required>

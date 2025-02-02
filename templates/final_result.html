@@ -54,6 +54,7 @@
             <th>Duration</th>
             <th>Score</th>
             <th>Region</th>
+            <th>Name</th>
         </tr>
         {% for score in recent_scores %}
         <tr>
@@ -61,6 +62,7 @@
             <td>{{ score[1] }}</td>
             <td>{{ score[2] }}</td>
             <td>{{ score[3] }}</td>
+            <td>{{ score[4] }}</td>
         </tr>
         {% endfor %}
     </table>
