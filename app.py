@@ -18,6 +18,17 @@ def read_scores():
     try:
         with open('scores.txt', 'r') as file:
             scores = [line.strip().split(',') for line in file.readlines()]
+            # Convert score and duration to integers for sorting
+            for score in scores:
+                score[2] = int(score[2])  # Convert score to integer
+                minutes, seconds = map(int, score[1].split(':'))
+                score[1] = minutes * 60 + seconds  # Convert duration to total seconds
+            # Sort by score (descending) and then by duration (ascending)
+            scores.sort(key=lambda x: (-x[2], x[1]))
+            # Convert duration back to minutes:seconds format
+            for score in scores:
+                minutes, seconds = divmod(score[1], 60)
+                score[1] = f'{minutes}:{seconds:02d}'
             return scores
     except FileNotFoundError:
         return []
