@@ -71,7 +71,7 @@ def home():
 
     # Laske current_question sen jälkeen, kun uusi kysymys on lisätty listaan
     current_question = len(session['asked_countries'])
-    total_questions = len(countries) * 2  # Each country has a flag and a capital question
+    total_questions = len(countries)  # Each country has a flag and a capital question
 
     return render_template('index.html', countries=countries_info, correct_country=correct_country['name']['common'], correct_capital=session['correct_country_capital'], current_question=current_question, total_questions=total_questions)
 
@@ -82,7 +82,11 @@ def select_region():
         'Southern Europe': 'https://restcountries.com/v3.1/subregion/Southern Europe',
         'Europe': 'https://restcountries.com/v3.1/region/europe'
     }
-    region_counts = {region: len(requests.get(url).json()) for region, url in regions.items()}
+    region_counts = {}
+    for region, url in regions.items():
+        countries = requests.get(url).json()
+        independent_countries = [country for country in countries if country.get('independent', False)]
+        region_counts[region] = len(independent_countries)
     return render_template('select_region.html', regions=regions, region_counts=region_counts)
 
 @app.route('/check', methods=['POST'])
