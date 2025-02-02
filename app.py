@@ -6,9 +6,8 @@ import datetime
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Tarvitaan sessioiden käyttämiseen
 
-def get_countries():
-    response = requests.get('https://restcountries.com/v3.1/subregion/Northern Europe')
-    # response = requests.get('https://restcountries.com/v3.1/region/europe')
+def get_countries(region_url):
+    response = requests.get(region_url)
     countries = response.json()
     # Valitaan vain itsenäiset maat
     independent_countries = [country for country in countries if country.get('independent', False)]
@@ -29,8 +28,8 @@ def write_score(score):
 
 @app.route('/')
 def home():
-    # Hae kaikki Euroopan maat
-    countries = get_countries()
+    selected_region = session.get('selected_region', 'https://restcountries.com/v3.1/region/europe')
+    countries = get_countries(selected_region)
 
     # Jos sessio ei ole aloitettu, alusta se
     if 'score' not in session:
@@ -72,9 +71,19 @@ def home():
 
     # Laske current_question sen jälkeen, kun uusi kysymys on lisätty listaan
     current_question = len(session['asked_countries'])
-    total_questions = len(countries)
+    total_questions = len(countries) * 2  # Each country has a flag and a capital question
 
     return render_template('index.html', countries=countries_info, correct_country=correct_country['name']['common'], correct_capital=session['correct_country_capital'], current_question=current_question, total_questions=total_questions)
+
+@app.route('/select_region')
+def select_region():
+    regions = {
+        'Northern Europe': 'https://restcountries.com/v3.1/subregion/Northern Europe',
+        'Southern Europe': 'https://restcountries.com/v3.1/subregion/Southern Europe',
+        'Europe': 'https://restcountries.com/v3.1/region/europe'
+    }
+    region_counts = {region: len(requests.get(url).json()) for region, url in regions.items()}
+    return render_template('select_region.html', regions=regions, region_counts=region_counts)
 
 @app.route('/check', methods=['POST'])
 def check():
@@ -87,7 +96,7 @@ def check():
     correct_country_flag = session['correct_country_flag']
     correct_country_capital = session['correct_country_capital']
     
-    country_result = "Correct!" if selected_country == correct_country else f"Wrong! The correct flag is <img src='{correct_country_flag}' alt='Flag of {correct_country}' width='100'>."
+    country_result = "Correct!" if selected_country == correct_country else f"Wrong! The correct flag of {correct_country} is <img src='{correct_country_flag}' alt='Flag of {correct_country}' width='100'>."
     capital_result = "Correct!" if selected_capital == correct_country_capital else f"Wrong! The capital of {correct_country} is {correct_country_capital}."
     
     if selected_country == correct_country:
@@ -104,6 +113,12 @@ def next_question():
 @app.route('/reset')
 def reset():
     session.clear()
+    return redirect(url_for('select_region'))
+
+@app.route('/set_region', methods=['POST'])
+def set_region():
+    selected_region = request.form['region']
+    session['selected_region'] = selected_region
     return redirect(url_for('home'))
 
 if __name__ == '__main__':
