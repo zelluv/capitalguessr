@@ -1,3 +1,4 @@
+ython/capitalguessr/templates/recent_scores.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,6 +13,18 @@
             justify-content: center;
             height: 100vh;
             text-align: center;
+        }
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
         }
         .button-container {
             display: flex;
@@ -34,11 +47,22 @@
 </head>
 <body>
     <h1>Recent Scores</h1>
-    <ul>
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Duration</th>
+            <th>Score</th>
+            <th>Region</th>
+        </tr>
         {% for score in recent_scores %}
-        <li>{{ score[0] }}: {{ score[1] }}</li>
+        <tr>
+            <td>{{ score[0] }}</td>
+            <td>{{ score[1] }}</td>
+            <td>{{ score[2] }}</td>
+            <td>{{ score[3] }}</td>
+        </tr>
         {% endfor %}
-    </ul>
+    </table>
     <div class="button-container">
         <a href="{{ url_for('select_region') }}">
             <button>Back to Region Selection</button>

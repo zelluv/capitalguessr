@@ -13,6 +13,18 @@
             height: 100vh;
             text-align: center;
         }
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
         .button-container {
             display: flex;
             gap: 20px;
@@ -36,11 +48,22 @@
     <h1>Final Result</h1>
     <p>Your score: {{ score }} / {{ max_score }}</p>
     <h2>Recent Scores</h2>
-    <ul>
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Duration</th>
+            <th>Score</th>
+            <th>Region</th>
+        </tr>
         {% for score in recent_scores %}
-        <li>{{ score[0] }}: {{ score[1] }}</li>
+        <tr>
+            <td>{{ score[0] }}</td>
+            <td>{{ score[1] }}</td>
+            <td>{{ score[2] }}</td>
+            <td>{{ score[3] }}</td>
+        </tr>
         {% endfor %}
-    </ul>
+    </table>
     <div class="button-container">
         <form action="{{ url_for('reset') }}" method="get">
             <button type="submit">Reset Quiz</button>
