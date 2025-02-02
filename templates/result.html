@@ -4,10 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Result</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+    </style>
+    <script>
+        // Redirect to the next question after 3 seconds
+        setTimeout(function() {
+            window.location.href = "{{ url_for('next_question') }}";
+        }, 3000);
+    </script>
 </head>
 <body>
-    <h1>{{ result|safe }}</h1>
-    <a href="{{ url_for('next_question') }}">Next Question</a>
+    <h1>Country Result: {{ country_result | safe }}</h1>
+    <h1>Capital Result: {{ capital_result }}</h1>
+    <p>Redirecting to the next question...</p>
 </body>
 </html>

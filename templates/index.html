@@ -3,28 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guess the Flag</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <script>
-        function selectCountry(country) {
-            document.getElementById('selected_country').value = country;
-            document.getElementById('country_form').submit();
+    <title>Capital Guessr</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
         }
-    </script>
+        .flag-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .flag-container label {
+            cursor: pointer;
+        }
+        .flag-container input[type="radio"] {
+            display: none;
+        }
+        .flag-container input[type="radio"]:checked + img {
+            border: 3px solid #007BFF; /* Change the color and width as needed */
+            border-radius: 5px; /* Optional: add rounded corners */
+        }
+    </style>
 </head>
 <body>
-    <h1>Which is the flag of {{ correct_country }}?</h1>
-    <p class="question-info">Question {{ current_question }} of {{ total_questions }}</p>
-    <form id="country_form" method="POST" action="{{ url_for('check') }}">
-        <input type="hidden" id="selected_country" name="country">
+    <h1>Question {{ current_question }} of {{ total_questions }}</h1>
+    <h2>Which is the flag of {{ correct_country }}?</h2>
+    <form action="{{ url_for('check') }}" method="post">
         <div class="flag-container">
             {% for country in countries %}
-                <div class="flag-item" onclick="selectCountry('{{ country.name }}')">
-                    <img src="{{ country.flag }}" alt="Flag of {{ country.name }}" width="150">
-                </div>
+            <label>
+                <input type="radio" name="country" value="{{ country.name }}" required>
+                <img src="{{ country.flag }}" alt="Flag of {{ country.name }}" width="100">
+            </label>
             {% endfor %}
         </div>
+        <h2>What is the capital of {{ correct_country }}?</h2>
+        {% for country in countries %}
+        <input type="radio" name="capital" value="{{ country.capital }}" required> {{ country.capital }}<br>
+        {% endfor %}
+        <button type="submit">Submit</button>
     </form>
-    <a href="{{ url_for('reset') }}" class="btn-reset">Reset</a>
 </body>
 </html>

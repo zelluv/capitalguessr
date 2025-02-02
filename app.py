@@ -39,7 +39,7 @@ def home():
 
     # Jos kaikki maat on kysytty, näytä tulossivu
     if len(session['asked_countries']) == len(countries):
-        max_score = len(countries)
+        max_score = len(countries) * 2  # Each country has a flag and a capital question
         score = session['score']
         write_score(score)
         session.clear()
@@ -53,18 +53,12 @@ def home():
     correct_country = random.choice(remaining_countries)
     session['correct_country'] = correct_country['name']['common']
     session['correct_country_flag'] = correct_country['flags']['png']
+    session['correct_country_capital'] = correct_country['capital'][0] if 'capital' in correct_country and correct_country['capital'] else 'Unknown'
     session['asked_countries'].append(correct_country['name']['common'])
 
-    # Lista tietyistä maista
-    specific_countries = ['Slovenia', 'Slovakia', 'Croatia', 'Serbia', 'Netherlands']
-
-    # Jos oikea maa on yksi tietyistä maista, aseta vaihtoehdoiksi nämä viisi maata
-    if correct_country['name']['common'] in specific_countries:
-        selected_countries = [country for country in countries if country['name']['common'] in specific_countries]
-    else:
-        # Valitse muut vaihtoehdot kaikista maista, varmistaen, että ne eivät ole sama kuin oikea vastaus
-        other_options = [country for country in countries if country['name']['common'] != correct_country['name']['common']]
-        selected_countries = random.sample(other_options, 4) + [correct_country]
+    # Valitse muut vaihtoehdot kaikista maista, varmistaen, että ne eivät ole sama kuin oikea vastaus
+    other_options = [country for country in countries if country['name']['common'] != correct_country['name']['common']]
+    selected_countries = random.sample(other_options, 4) + [correct_country]
 
     # Sekoita valitut maat
     random.shuffle(selected_countries)
@@ -72,14 +66,15 @@ def home():
     # Hae tarvittavat tiedot
     countries_info = [{
         'name': country['name']['common'],
-        'flag': country['flags']['png']
+        'flag': country['flags']['png'],
+        'capital': country['capital'][0] if 'capital' in country and country['capital'] else 'Unknown'
     } for country in selected_countries]
 
     # Laske current_question sen jälkeen, kun uusi kysymys on lisätty listaan
     current_question = len(session['asked_countries'])
     total_questions = len(countries)
 
-    return render_template('index.html', countries=countries_info, correct_country=correct_country['name']['common'], current_question=current_question, total_questions=total_questions)
+    return render_template('index.html', countries=countries_info, correct_country=correct_country['name']['common'], correct_capital=session['correct_country_capital'], current_question=current_question, total_questions=total_questions)
 
 @app.route('/check', methods=['POST'])
 def check():
@@ -87,15 +82,20 @@ def check():
         return redirect(url_for('home'))
     
     selected_country = request.form['country']
+    selected_capital = request.form['capital']
     correct_country = session['correct_country']
     correct_country_flag = session['correct_country_flag']
+    correct_country_capital = session['correct_country_capital']
+    
+    country_result = "Correct!" if selected_country == correct_country else f"Wrong! The correct flag is <img src='{correct_country_flag}' alt='Flag of {correct_country}' width='100'>."
+    capital_result = "Correct!" if selected_capital == correct_country_capital else f"Wrong! The capital of {correct_country} is {correct_country_capital}."
+    
     if selected_country == correct_country:
         session['score'] += 1
-        result = "Correct!"
-    else:
-        result = f"Wrong! The flag of {correct_country} is <img src='{correct_country_flag}' alt='Flag of {correct_country}' width='100'>"
+    if selected_capital == correct_country_capital:
+        session['score'] += 1
     
-    return render_template('result.html', result=result)
+    return render_template('result.html', country_result=country_result, capital_result=capital_result)
 
 @app.route('/next')
 def next_question():
