@@ -7,8 +7,22 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
-    <h1>Game Over!</h1>
-    <p>Your score: {{ score }} out of {{ max_score }}</p>
-    <a href="/">Play Again</a>
+    <h1>Final Result</h1>
+    <p>Your score: {{ score }} / {{ max_score }}</p>
+    <h2>Recent Scores</h2>
+    <table border="1">
+        <tr>
+            <th>Date</th>
+            <th>Score</th>
+        </tr>
+        {% for date, score in recent_scores %}
+        <tr>
+            <td>{{ date }}</td>
+            <td>{{ score }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <a href="{{ url_for('reset') }}">Reset</a>
 </body>
 </html>

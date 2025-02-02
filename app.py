@@ -1,16 +1,31 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 import requests
 import random
+import datetime
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Tarvitaan sessioiden käyttämiseen
 
 def get_countries():
-    response = requests.get('https://restcountries.com/v3.1/region/europe')
+    response = requests.get('https://restcountries.com/v3.1/subregion/Northern Europe')
+    # response = requests.get('https://restcountries.com/v3.1/region/europe')
     countries = response.json()
     # Valitaan vain itsenäiset maat
     independent_countries = [country for country in countries if country.get('independent', False)]
     return independent_countries
+
+def read_scores():
+    try:
+        with open('scores.txt', 'r') as file:
+            scores = [line.strip().split(',') for line in file.readlines()]
+            return scores
+    except FileNotFoundError:
+        return []
+
+def write_score(score):
+    with open('scores.txt', 'a') as file:
+        date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        file.write(f'{date},{score}\n')
 
 @app.route('/')
 def home():
@@ -26,8 +41,10 @@ def home():
     if len(session['asked_countries']) == len(countries):
         max_score = len(countries)
         score = session['score']
+        write_score(score)
         session.clear()
-        return render_template('final_result.html', score=score, max_score=max_score)
+        recent_scores = read_scores()[-10:]  # Read the 10 most recent scores
+        return render_template('final_result.html', score=score, max_score=max_score, recent_scores=recent_scores)
 
     # Valitse jäljellä olevat maat, joita ei ole vielä kysytty
     remaining_countries = [country for country in countries if country['name']['common'] not in session['asked_countries']]
